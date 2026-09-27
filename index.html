@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#162640" />
+  <title>Anton's Apartment Quest</title>
+  <meta name="description" content="A small voxel family apartment adventure built for GitHub Pages." />
+  <link rel="stylesheet" href="./styles.css" />
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js"
+      }
+    }
+  </script>
+</head>
+<body>
+  <div id="app">
+    <canvas id="game-canvas" aria-label="3D apartment game"></canvas>
+
+    <section id="menu" class="panel menu-panel">
+      <div class="brand-lockup">
+        <div class="brand-kicker">Family voxel adventure</div>
+        <h1>Anton’s<br><span>Apartment Quest</span></h1>
+        <p>Explore home, complete missions, help the family and improve the apartment.</p>
+      </div>
+
+      <div class="menu-actions">
+        <button id="start-btn" class="big-btn primary">▶ Start Game</button>
+        <button id="continue-btn" class="big-btn blue">▣ Continue</button>
+        <button data-open="wall" class="big-btn amber">▤ Family Wall</button>
+        <button data-open="chat" class="big-btn purple">▣ HomeChat</button>
+        <button data-open="settings" class="big-btn slate">⚙ Settings</button>
+      </div>
+
+      <div class="family-strip" aria-label="Family characters">
+        <div class="family-card anton"><span class="avatar">A</span><b>Anton</b><small>13 · blond · blue eyes</small></div>
+        <div class="family-card anna"><span class="avatar">A</span><b>Anna</b><small>5 · blond · blue eyes</small></div>
+        <div class="family-card mama"><span class="avatar">M</span><b>Mama</b><small>black hair · blue eyes</small></div>
+        <div class="family-card papa"><span class="avatar">P</span><b>Papa</b><small>blond · blue eyes</small></div>
+      </div>
+    </section>
+
+    <section id="hud" class="hidden" aria-live="polite">
+      <div class="hud-top-left glass">
+        <div class="portrait">A</div>
+        <div>
+          <strong>Anton <span id="level">Lv. 1</span></strong>
+          <div class="xp-row"><div class="xp-track"><span id="xp-fill"></span></div><small id="xp-label">0 / 100 XP</small></div>
+        </div>
+      </div>
+
+      <div class="hud-top-center glass">
+        <span>🪙 <b id="coins">0</b></span>
+        <span>⭐ <b id="stars">0</b>/6</span>
+      </div>
+
+      <div id="save-indicator" class="hud-save glass">▣ Saved</div>
+
+      <aside class="missions glass">
+        <h2>Today’s Missions</h2>
+        <div id="mission-list"></div>
+      </aside>
+
+      <button id="chat-fab" class="chat-fab" aria-label="Open HomeChat">💬<span id="chat-badge">0</span><small>HomeChat</small></button>
+
+      <div class="mini-map glass">
+        <div class="mini-title">HOME MAP</div>
+        <div id="mini-player"></div>
+        <div class="room-block r-living">Living</div>
+        <div class="room-block r-kitchen">Kitchen</div>
+        <div class="room-block r-anna">Anna</div>
+        <div class="room-block r-bath">Bath</div>
+        <div class="room-block r-master">Parents</div>
+        <div class="room-block r-anton">Anton</div>
+      </div>
+
+      <div id="interaction" class="interaction hidden"><kbd>E</kbd><span id="interaction-label">Interact</span></div>
+      <div id="toast" class="toast hidden"></div>
+    </section>
+
+    <div id="mobile-controls" class="mobile-controls hidden">
+      <div class="dpad">
+        <button data-move="up">▲</button>
+        <div><button data-move="left">◀</button><button data-move="down">▼</button><button data-move="right">▶</button></div>
+      </div>
+      <button id="mobile-interact" class="mobile-interact">E</button>
+    </div>
+
+    <dialog id="wall-dialog" class="modal">
+      <form method="dialog"><button class="modal-close" aria-label="Close">×</button></form>
+      <header><p class="eyebrow">Apartment living room</p><h2>Family Wall</h2><p>Pictures and family news appear here. Add new posts in <code>data/family-wall.json</code>, or use the optional cloud setup.</p></header>
+      <div id="wall-posts" class="wall-posts"></div>
+    </dialog>
+
+    <dialog id="chat-dialog" class="modal chat-modal">
+      <form method="dialog"><button class="modal-close" aria-label="Close">×</button></form>
+      <header><p class="eyebrow">Private family messenger</p><h2>HomeChat</h2><p id="chat-mode-note">Local demo mode</p></header>
+      <div class="chat-layout">
+        <nav id="chat-threads" class="chat-threads"></nav>
+        <section class="chat-window">
+          <div id="chat-title" class="chat-title">Papa</div>
+          <div id="chat-messages" class="chat-messages"></div>
+          <form id="chat-form" class="chat-composer">
+            <input id="chat-input" autocomplete="off" maxlength="500" placeholder="Write a message…" />
+            <button type="submit">Send</button>
+          </form>
+        </section>
+      </div>
+    </dialog>
+
+    <dialog id="settings-dialog" class="modal">
+      <form method="dialog"><button class="modal-close" aria-label="Close">×</button></form>
+      <header><p class="eyebrow">Game options</p><h2>Settings</h2></header>
+      <div class="settings-grid">
+        <label>Camera distance<input id="camera-distance" type="range" min="6" max="15" step="0.5" value="9" /></label>
+        <label>Sound effects<input id="sound-enabled" type="checkbox" checked /></label>
+        <label>Show quest markers<input id="markers-enabled" type="checkbox" checked /></label>
+        <section id="cloud-login-box" class="cloud-login-box hidden">
+          <h3>Family cloud login</h3>
+          <p>Only shown when cloud mode is enabled in <code>config.js</code>.</p>
+          <input id="cloud-email" type="email" autocomplete="username" placeholder="Anton login email" />
+          <input id="cloud-password" type="password" autocomplete="current-password" placeholder="Password" />
+          <button id="cloud-login-btn" type="button">Sign in</button>
+          <small id="cloud-auth-status"></small>
+        </section>
+        <button id="reset-save" class="danger-btn" type="button">Reset local progress</button>
+      </div>
+    </dialog>
+
+    <dialog id="intro-dialog" class="modal intro-modal">
+      <form method="dialog"><button class="modal-close" aria-label="Close">×</button></form>
+      <h2>Welcome home, Anton</h2>
+      <p>Move with <b>WASD</b> or the arrow keys. Walk close to a glowing mission marker and press <b>E</b>. On touch devices, use the on-screen controls.</p>
+      <p>Your progress is automatically saved in this browser. Cloud sync and cross-device family messaging can be enabled with the optional Supabase setup included in the repository.</p>
+      <form method="dialog"><button class="big-btn primary">Got it</button></form>
+    </dialog>
+  </div>
+
+  <script src="./config.js"></script>
+  <script type="module" src="./js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+[
+  {
+    "id":"welcome",
+    "date":"2026-09-27",
+    "title":"Welcome to the Family Wall",
+    "text":"New family pictures, news and little surprises can appear here in future releases.",
+    "image":""
+  },
+  {
+    "id":"quest-tip",
+    "date":"2026-09-27",
+    "title":"Apartment Quest Tip",
+    "text":"Walk to the glowing markers and press E. Every completed mission earns XP and coins.",
+    "image":""
+  }
+]

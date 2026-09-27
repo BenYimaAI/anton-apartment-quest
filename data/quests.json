@@ -1,0 +1,8 @@
+[
+  {"id":"clean","title":"Clean","icon":"🧹","x":-9.5,"z":6.5,"xp":20,"coins":10,"hint":"Clean the laundry / utility area."},
+  {"id":"eat","title":"Eat","icon":"🍽️","x":-6.0,"z":-5.5,"xp":15,"coins":5,"hint":"Sit down at the dining table and eat."},
+  {"id":"tidy","title":"Tidy Up","icon":"📦","x":-9.5,"z":2.0,"xp":25,"coins":12,"hint":"Help tidy Anna's room."},
+  {"id":"renovate","title":"Renovate","icon":"🔨","x":-11.0,"z":-3.5,"xp":35,"coins":18,"hint":"Improve the living-room wall."},
+  {"id":"cook","title":"Cook","icon":"👨‍🍳","x":1.0,"z":-0.5,"xp":30,"coins":15,"hint":"Prepare a family meal in the kitchen."},
+  {"id":"anna","title":"Play with Anna","icon":"👧","x":-7.0,"z":-2.0,"xp":40,"coins":20,"hint":"Spend some time playing with Anna."}
+]
